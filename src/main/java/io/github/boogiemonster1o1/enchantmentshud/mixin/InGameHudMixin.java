@@ -5,7 +5,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ListTag;
 import org.spongepowered.asm.mixin.Final;
@@ -25,8 +27,26 @@ public abstract class InGameHudMixin {
     @Inject(method="method_2420",at=@At(value="INVOKE",target = "Lnet/minecraft/item/ItemStack;getName()Ljava/lang/String;"))
     public void enchantments(Window window,CallbackInfo ci){
         if (this.heldItemTooltipFade > 0 && this.heldItem != null && this.heldItem.hasEnchantments()) {
-            ListTag enchantments = this.heldItem.getEnchantments();
-            System.out.println(enchantments.get(0));
+            ListTag enchantmentList = this.heldItem.getEnchantments();
+            System.out.println(enchantmentList.getString(0));
+            StringBuilder enchantments = new StringBuilder();
+            for(int a = 0; a < enchantmentList.size();a++){
+                String val = enchantmentList.getString(a);
+                val = val.replace("{","");
+                val = val.replace("}","");
+                val = val.replace("s","");
+                String[] arr = new String[2];
+                arr = val.split(",");
+                String[] level = arr[0].split(":");
+                int enchantmentlevel = Integer.parseInt(level[1]);
+                String[] enchantmentId = arr[1].split(":");
+                String enchantmentName = I18n.translate(Enchantment.byRawId(Integer.parseInt(enchantmentId[1])).getTranslationKey());
+                enchantments.append(enchantmentName);
+                enchantments.append(" ");
+                enchantments.append(enchantmentlevel);
+            }
+
+            System.out.println(enchantments);
 
 //            String string = this.heldItem.getName();
 //            if (this.heldItem.hasCustomName()) {
