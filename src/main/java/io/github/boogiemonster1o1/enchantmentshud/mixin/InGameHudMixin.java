@@ -54,19 +54,21 @@ public abstract class InGameHudMixin {
 
     @Inject(method="method_2420",at=@At(value="INVOKE",target = "Lcom/mojang/blaze3d/platform/GlStateManager;disableBlend()V"))
     public void displayEnchantments(Window window,CallbackInfo ci){
-        int ii = (window.getScaledWidth() - this.getFontRenderer().getStringWidth(enchantments.toString())) / 2;
-        int jj = window.getScaledHeight() - 59;
-        if (!this.client.interactionManager.hasStatusBars()) {
-            jj += 14;
-        }
+        if(this.heldItem.hasEnchantments()){
+            int ii = (window.getScaledWidth() - this.getFontRenderer().getStringWidth(enchantments.toString())) / 2;
+            int jj = window.getScaledHeight() - 59;
+            if (!this.client.interactionManager.hasStatusBars()) {
+                jj += 14;
+            }
 
-        int kk = (int)((float)this.heldItemTooltipFade * 256.0F / 10.0F);
-        if (kk > 255) {
-            kk = 255;
+            int kk = (int) ((float) this.heldItemTooltipFade * 256.0F / 10.0F);
+            if (kk > 255) {
+                kk = 255;
+            }
+            String finalText = Formatting.BLUE + enchantments.toString() + Formatting.RESET;
+            System.out.println(finalText);
+            this.getFontRenderer().drawWithShadow(finalText, (float) ii, (float) jj + 5, 16777215 + (kk << 24));
         }
-        String finalText = Formatting.BLUE + enchantments.toString() + Formatting.RESET;
-        System.out.println(finalText);
-        this.getFontRenderer().drawWithShadow(finalText, (float)ii, (float)jj + 5, 16777215 + (kk << 24));
     }
 
     @Shadow
