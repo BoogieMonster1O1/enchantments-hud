@@ -1,5 +1,6 @@
 package io.github.boogiemonster1o1.enchantmentshud.mixin;
 
+import io.github.boogiemonster1o1.enchantmentshud.EnchantmentsHud;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -11,6 +12,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Formatting;
+import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,6 +34,7 @@ public abstract class InGameHudMixin {
         if (this.heldItemTooltipFade > 0 && this.heldItem != null && this.heldItem.hasEnchantments()) {
             ListTag enchantmentList = this.heldItem.getEnchantments();
             StringBuilder enchantments = new StringBuilder();
+            int count = 0;
             for(int a = 0; a < enchantmentList.size();a++){
                 String val = enchantmentList.getString(a);
                 val = val.replace("{","");
@@ -42,13 +45,15 @@ public abstract class InGameHudMixin {
                 int enchantmentLevel = Integer.parseInt(level[1]);
                 String[] enchantmentId = arr[1].split(":");
                 String enchantmentName = I18n.translate(Enchantment.byRawId(Integer.parseInt(enchantmentId[1])).getTranslationKey());
+                enchantments.append("   ");
                 enchantments.append(enchantmentName);
                 enchantments.append(" ");
                 enchantments.append(enchantmentLevel);
-                enchantments.append("   ");
+                count++;
             }
+            enchantments.append("   ");
             this.enchantments = enchantments;
-            System.out.println(enchantments.toString());
+            LogManager.getLogger(EnchantmentsHud.class).debug("Displaying {} enchantments: {}",count, enchantments.toString());
         }
     }
 
@@ -65,7 +70,7 @@ public abstract class InGameHudMixin {
             if (kk > 255) {
                 kk = 255;
             }
-            String finalText = Formatting.BLUE + enchantments.toString() + Formatting.RESET;
+            String finalText = Formatting.AQUA + enchantments.toString() + Formatting.RESET;
             System.out.println(finalText);
             this.getFontRenderer().drawWithShadow(finalText, (float) ii, (float) jj + 5, 16777215 + (kk << 24));
         }
