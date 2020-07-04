@@ -29,7 +29,9 @@ public abstract class InGameHudMixin {
 
     private StringBuilder enchantments;
 
-    private StringBuilder getEnchantments(){
+    @Inject(method="method_2420",at=@At(value="INVOKE",target = "Lnet/minecraft/item/ItemStack;getName()Ljava/lang/String;"))
+    private void enchantments(Window window,CallbackInfo ci){
+        if (this.heldItemTooltipFade > 0 && this.heldItem != null && this.heldItem.hasEnchantments()) {
             ListTag enchantmentList = this.heldItem.getEnchantments();
             StringBuilder enchantments = new StringBuilder();
             int count = 0;
@@ -48,11 +50,11 @@ public abstract class InGameHudMixin {
                 enchantments.append(" ");
                 enchantments.append(enchantmentLevel);
                 count++;
-                enchantments.append("   ");
-                this.enchantments = enchantments;
             }
+            enchantments.append("   ");
+            this.enchantments = enchantments;
             LogManager.getLogger(EnchantmentsHud.class).debug("Displaying {} enchantments: {}",count, enchantments.toString());
-            return enchantments;
+        }
     }
 
     @Inject(method="method_2420",at=@At(value="INVOKE",target = "Lcom/mojang/blaze3d/platform/GlStateManager;disableBlend()V"))
@@ -68,7 +70,8 @@ public abstract class InGameHudMixin {
             if (kk > 255) {
                 kk = 255;
             }
-            String finalText = Formatting.AQUA + this.getEnchantments().toString() + Formatting.RESET;
+            String finalText = Formatting.AQUA + this.enchantments.toString() + Formatting.RESET;
+            System.out.println(finalText);
             this.getFontRenderer().drawWithShadow(finalText, (float) ii, (float) jj + 10, 16777215 + (kk << 24));
         }
     }
